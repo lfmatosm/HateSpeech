@@ -21,6 +21,7 @@ def vetorizar_texto(texto, tradutor):
                 vetor[posicao] += 1
     return vetor
 
+#O Natural Language Toolkit necessita de bases de dados/bibliotecas que possam categorizar informações em pt-BR.
 nltk.download('stopwords')
 nltk.download('rslp')
 nltk.download('punkt')
@@ -74,7 +75,10 @@ marcas = classificacoes['valor']
 X = np.array(vetoresDeTexto)
 Y = np.array(marcas.tolist())
 
-#Separação das bases de treino e validação. A base de teites será separada a partir da base de treino usando k-folding (?).
+#Separação das bases de treino e validação. A base de teites será separada a partir da base de treino usando cross-validation
+# (validação cruzada - por um número k determinado de vezes, seleciona-se aleatoriamente dentro da base de dados os trechos
+# que serão usados para treinamento e aqueles que serão usados para teste, de acordo com as porcentgens definidas anteriormente.
+# O desempenho do classificador será dado pela média das k vezes em que o cross-validation foi empregado).
 porcentagem_de_treino = 0.8
 
 tamanho_do_treino = int(porcentagem_de_treino * len(Y))
@@ -89,7 +93,7 @@ validacao_dados = X[tamanho_do_treino:]
 validacao_marcacoes = Y[tamanho_do_treino:]
 
 #Realiza o treino e predição de um classificador do tipo modelo, com determinado nome e base de treino com anotações
-# de respostas corretas.
+# de respostas corretas. Utiliza cross-validation.
 def fit_and_predict(nome, modelo, treino_dados, treino_marcacoes):
     k = 10
     scores = cross_val_score(modelo, treino_dados, treino_marcacoes, cv=k)
