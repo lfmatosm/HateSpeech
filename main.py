@@ -3,22 +3,17 @@ import numpy as np
 from collections import Counter
 import ProcessadorTexto as prtxt
 from sklearn.model_selection import cross_val_score
-from sklearn.multiclass import OneVsRestClassifier
-from sklearn.svm import LinearSVC
-from sklearn.multiclass import OneVsOneClassifier
 from sklearn.ensemble import AdaBoostClassifier
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.linear_model import SGDClassifier
+from sklearn.naive_bayes import BernoulliNB
+from sklearn.linear_model import LogisticRegression
 
-#Realiza o treino e predição de um classificador do tipo modelo, com determinado nome e base de treino com anotações
-# de respostas corretas. Utiliza cross-validation.
-def treinarEPrever(nome, modelo, treino_dados, treino_marcacoes):
-    k = 10
-    scores = cross_val_score(modelo, treino_dados, treino_marcacoes, cv=k)
-    taxa_de_acerto = np.mean(scores)*100
-    msg = "Taxa de acerto do {0}: {1}%".format(nome, taxa_de_acerto)
-    print(msg)
-    return taxa_de_acerto
+#Métricas de avaliação de erro a serem empregadas para verificar o desempenho de cada um dos classificadores.
+metricas = ['accuracy', 'balanced_accuracy', 'roc_auc']
+
+#Criação de todos os classificadores.
+nomes = ['Linear Classifier (Logistic Regression)', 'BernoulliNB (Naïve Bayes)',
+         'AdaBoost Classifier (?)']
+classificadores = [LogisticRegression(random_state=0), BernoulliNB(), AdaBoostClassifier(random_state=0)]
 
 proc = prtxt.ProcessadorTexto()
 
@@ -50,23 +45,26 @@ y_treino = Y[0:tamanho_do_treino]
 x_validacao = X[tamanho_do_treino:]
 y_validacao = Y[tamanho_do_treino:]
 
-#Criação de todos os classificadores e realização de treinamento/predição com os mesmos. Acúmulo dos seus resultados
-SGDC = SGDClassifier(loss='log', alpha=0.1, penalty='l2')
-OneVsRest = OneVsRestClassifier(LinearSVC(random_state=0))
-OneVsOne = OneVsOneClassifier(LinearSVC(random_state=0))
-Multinomial = MultinomialNB()
-AdaBoost = AdaBoostClassifier(random_state=0)
-classificadores = [('Stochastic Gradient Descent', SGDC), ('OneVsRest', OneVsRest), ('OneVsOne', OneVsOne),
-                   ('MultinomialNB', Multinomial), ('AdaBoost Classifier', AdaBoost)]
-resultados = {}
+resultados = []
 
-for tupla in classificadores:
-    resultado = treinarEPrever(tupla[0], tupla[1], x_treino, y_treino)
-    resultados[resultado] = tupla[1]
+#Para cada  classificador, realiza treinamento e teste, e avalia o erro/score segundo cada uma das métricas especificadas.
+#Realiza o treino e predição de cada classificador, com determinado nome e base de treino com anotações
+# de respostas corretas. Utiliza cross-validation. Emprega cada uma das métricas de avaliação de desempenho.
+for i in range(len(classificadores)):
+    results_metricas = []
+    for met in metricas:
+        scores = cross_val_score(classificadores[i], x_treino, y_treino, cv=10, scoring=met)
+        taxa = np.mean(scores)
+        msg = "Taxa de acerto ({0}) - métrica '{1}': {2} ({3})".format(nomes[i], met, taxa, np.std(scores))
+        print(msg)
+        results_metricas.append(taxa)
+    resultados.append(results_metricas)
 
 #Determinação do classificador de maior desempenho entre os testados.
-maximo = max(resultados)
-vencedor = resultados[maximo]
+maximo = max(resultados[0])
+pos_vencedor = [i for i, j in enumerate(resultados[0]) if j == maximo][0]
+vencedor = classificadores[pos_vencedor]
+
 #Novo treinamento e predição (predição desta vez realizada com base de validação) do classificador de melhor
 # desempenho nos testes.
 vencedor.fit(x_treino, y_treino)
@@ -75,8 +73,8 @@ resultado = vencedor.predict(x_validacao)
 acertos = (resultado == y_validacao)
 total_de_acertos = sum(acertos)
 total_de_elementos = len(y_validacao)
-taxa_de_acerto = total_de_acertos / total_de_elementos * 100
-msg = "\nTaxa de acerto do vencedor entre os algoritmos no mundo real: {0}%".format(taxa_de_acerto)
+taxa_de_acerto = (total_de_acertos / total_de_elementos) * 100
+msg = "\nTaxa de acerto do vencedor ({0}) no mundo real: {1}%".format(nomes[pos_vencedor], taxa_de_acerto)
 print(msg)
 
 #Cálculo de eficiência de um algoritmo que classificaria todas as entradas da base como o valor/predição mais provável apenas.
@@ -84,4 +82,4 @@ print(msg)
 acerto_base = max(Counter(y_validacao).values())
 taxa_de_acerto_base = 100.0 * acerto_base/len(y_validacao)
 print('Taxa de acerto base: ' + str(taxa_de_acerto_base) + '%')
-print('Total de Testes: ' + str(len(x_validacao)))
+print('Total de testes: ' + str(len(x_validacao)))
