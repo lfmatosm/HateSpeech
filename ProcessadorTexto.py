@@ -10,8 +10,9 @@ class ProcessadorTexto():
         nltk.download('punkt')
         # Stopwords: artigos, preposições, conectivos, etc.
         self.stopwords = nltk.corpus.stopwords.words('portuguese')
+        # Objeto que extrai o radical de palavras.
         self.stemmer = nltk.stem.RSLPStemmer()
-        print(self.stopwords)
+        #print(self.stopwords)
 
     # Recebe um texto (frase de radicais) e um tradutor (dicionário mapeando radicais a valores de índice). Gera uma lista
     # de ocorrências de cada palavra (radical) do texto passado no próprio texto (acho que em toda a base, na verdade).
@@ -26,8 +27,6 @@ class ProcessadorTexto():
         return vetor
 
     def processar(self, textoOriginal):
-        # Objeto que extrai o radical de palavras.
-        #stemmer = nltk.stem.RSLPStemmer()
         # Transforma todas as frases em lower case.
         frases = textoOriginal.str.lower()
         # Cria os tokens para cada uma das frases: tokens serão as palavras de cada frase. Cada sequência de palavras numa mesma
@@ -42,9 +41,9 @@ class ProcessadorTexto():
             # 'stopwords' e têm tamanho maior que 2.
             validas = [self.stemmer.stem(palavra) for palavra in lista if palavra not in self.stopwords and len(palavra) > 2]
             dicionario.update(validas)
-        print(dicionario)
+        #print(dicionario)
         totalDePalavras = len(dicionario)
-        print(totalDePalavras)
+        #print(totalDePalavras)
         # Cria um iterador relacionando cada palavra do dicionário (conjunto) de palavras a um índice de 0 até totalDePalavras.
         tuplas = zip(dicionario, range(totalDePalavras))
         # Cria o tradutor. Este será um dicionário mapeando para cada palavra/radical (chave) um índice (valor) associado.
