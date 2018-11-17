@@ -64,7 +64,7 @@ for i in range(len(metricas)):
     for j in range(len(classificadores)):
         res_vet_met = []
         for k in range(TOTAL_KFOLDS):
-            scores = cross_val_score(classificadores[i], x_treino, y_treino, cv=k+2, scoring=metricas[i])
+            scores = cross_val_score(classificadores[j], x_treino, y_treino, cv=k+2, scoring=metricas[i])
             taxa = np.mean(scores)
             msg = "Taxa de acerto ({0}) - métrica '{1}': {2} ({3})".format(nomes[j], metricas[i], taxa, np.std(scores))
             print(msg)
