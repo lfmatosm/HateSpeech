@@ -6,6 +6,11 @@ import Graficos as grf
 from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.naive_bayes import BernoulliNB
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import NuSVC
+from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 
 TOTAL_KFOLDS = 5
@@ -20,9 +25,9 @@ resultados_metricas = {}
 metricas = ['accuracy', 'balanced_accuracy', 'roc_auc']
 
 #Criação de todos os classificadores.
-nomes = ['Linear Classifier (Logistic Regression)', 'BernoulliNB (Naïve Bayes)',
-         'AdaBoost Classifier (?)']
-classificadores = [LogisticRegression(random_state=0), BernoulliNB(), AdaBoostClassifier(random_state=0)]
+nomes = ['Logistic Regression', 'Multinomial Naive Bayes',
+         'VSM (Linear SVC)']
+classificadores = [LogisticRegression(), MultinomialNB(), LinearSVC()]
 
 proc = prtxt.ProcessadorTexto()
 
