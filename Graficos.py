@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
-import numpy as np
 
+#Cria um gráfico a partir dos parâmetros de abscissas e ordenadas passados como parâmetro e salva num arquivo PNG na raiz do programa.
 def mostrarGrafico(y_lreg, y_nvbayes, y_adaboost, x_kfolds, y_label):
     figure(num=None, figsize=(8, 6))
     plt.plot(x_kfolds, y_lreg, '.', label='Logistic regression',linestyle='-')  # Recebe dois arrays, um sera do K e outro dos resultados

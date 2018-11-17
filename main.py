@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from collections import Counter
 import ProcessadorTexto as prtxt
 import Graficos as grf
 from sklearn.model_selection import cross_val_score
@@ -87,7 +86,6 @@ for chave, valor in resultados_metricas.items():
     print(valor[2])
     grf.mostrarGrafico(cls1, cls2, cls3, kfolds, chave)
 
-#
 # #Determinação do classificador de maior desempenho entre os testados.
 # maximo = max(resultados[0])
 # pos_vencedor = [i for i, j in enumerate(resultados[0]) if j == maximo][0]
