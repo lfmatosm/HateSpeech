@@ -2,26 +2,20 @@ import pandas as pd
 import numpy as np
 import ProcessadorTexto as prtxt
 import Graficos as grf
-from sklearn.model_selection import cross_val_score
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.naive_bayes import BernoulliNB
+from sklearn.model_selection import cross_validate
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.naive_bayes import GaussianNB
-from sklearn.svm import NuSVC
 from sklearn.svm import LinearSVC
-from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
-TOTAL_KFOLDS = 5
-ACCURACY = 0
-BALANCED_ACC = 1
-ROC_AUC = 2
+TOTAL_KFOLDS = 10
 
-kfolds = [i+2 for i in range(TOTAL_KFOLDS)]
-resultados_metricas = {}
+kfolds = [i+1 for i in range(TOTAL_KFOLDS)]
 
 #Métricas de avaliação de erro a serem empregadas para verificar o desempenho de cada um dos classificadores.
 metricas = ['accuracy', 'balanced_accuracy', 'roc_auc']
+label_metricas = ['Acurácia', 'Acurácia Balanceada', 'Área sobre curva ROC']
 
 #Criação de todos os classificadores.
 nomes = ['Logistic Regression', 'Multinomial Naive Bayes',
@@ -50,62 +44,44 @@ porcentagem_de_treino = 0.8
 tamanho_do_treino = int(porcentagem_de_treino * len(Y))
 tamanho_da_validacao = int(len(Y) - tamanho_do_treino)
 
-#Separa os dados de treino e as anotações corretas de classificação dos mesmos.
-x_treino = X[0:tamanho_do_treino]
-y_treino = Y[0:tamanho_do_treino]
-
-#Separa os dados de validação e as anotações corretas de classificação dos mesmos.
-x_validacao = X[tamanho_do_treino:]
-y_validacao = Y[tamanho_do_treino:]
+#Separa os dados de treino/validação e as anotações corretas de classificação dos mesmos.
+x_treino, x_validacao, y_treino, y_validacao = train_test_split(X, Y, test_size=0.2, random_state=0)
 
 resultados = []
 
 #Para cada  classificador, realiza treinamento e teste, e avalia o erro/score segundo cada uma das métricas especificadas.
 #Realiza o treino e predição de cada classificador, com determinado nome e base de treino com anotações
 # de respostas corretas. Utiliza cross-validation. Emprega cada uma das métricas de avaliação de desempenho.
-for i in range(len(metricas)):
-    res_mat = []
-    for j in range(len(classificadores)):
-        res_vet_met = []
-        for k in range(TOTAL_KFOLDS):
-            scores = cross_val_score(classificadores[j], x_treino, y_treino, cv=k+2, scoring=metricas[i])
-            taxa = np.mean(scores)
-            msg = "Taxa de acerto ({0}) - métrica '{1}': {2} ({3})".format(nomes[j], metricas[i], taxa, np.std(scores))
-            print(msg)
-            res_vet_met.append(taxa)
-        res_mat.append(res_vet_met)
-    resultados_metricas[metricas[i]] = res_mat
+
+resultados_testes_metricas = {}
+resultados_validacao = {}
+
+for i in range(len(classificadores)):
+    scores = cross_validate(classificadores[i], x_treino, y_treino, cv=TOTAL_KFOLDS, scoring=metricas)
+    print("Scores: ")
+    print(scores)
+    resultados_testes_metricas[nomes[i]] = scores
+print(resultados_testes_metricas)
+
+for i in range(len(classificadores)):
+    classificadores[i].fit(x_treino, y_treino)
+    results = classificadores[i].predict(x_validacao)
+    acuracia = accuracy_score(y_validacao, results)
+    print("Results.: ")
+    print(results)
+    resultados_validacao[nomes[i]] = acuracia
+print(resultados_validacao)
 
 #Exibe uma imagem de um gráfico representando cada uma das métricas de avaliação empregadas.
-for chave, valor in resultados_metricas.items():
-    cls1 = valor[0]
-    cls2 = valor[1]
-    cls3 = valor[2]
-    print(valor[0])
-    print(valor[1])
-    print(valor[2])
-    grf.mostrarGrafico(cls1, cls2, cls3, kfolds, chave)
+for i in range(len(metricas)):
+    res_mets = []
+    for chave, valor in resultados_testes_metricas.items():
+        res_mets.append(valor['test_' + metricas[i]])
+    grf.mostrarGraficoLinhas(res_mets[0], res_mets[1], res_mets[2], kfolds, "Número do 'fold'", label_metricas[i])
 
- #Determinação do classificador de maior desempenho entre os testados.
-# maximo = max(resultados[0])
-# pos_vencedor = [i for i, j in enumerate(resultados[0]) if j == maximo][0]
-# vencedor = classificadores[pos_vencedor]
-#
-# #Novo treinamento e predição (predição desta vez realizada com base de validação) do classificador de melhor
-# # desempenho nos testes.
-# vencedor.fit(x_treino, y_treino)
-# resultado = vencedor.predict(x_validacao)
-# #Contabilização da qtd. de acertos do classificador e de seu desempenho em porcentagem.
-# acertos = (resultado == y_validacao)
-# total_de_acertos = sum(acertos)
-# total_de_elementos = len(y_validacao)
-# taxa_de_acerto = (total_de_acertos / total_de_elementos) * 100
-# msg = "\nTaxa de acerto do vencedor ({0}) no mundo real: {1}%".format(nomes[pos_vencedor], taxa_de_acerto)
-# print(msg)
-#
-# #Cálculo de eficiência de um algoritmo que classificaria todas as entradas da base como o valor/predição mais provável apenas.
-# #Usado para comparar com o desempenho do classificador escolhido, propriamente dito.
-# acerto_base = max(Counter(y_validacao).values())
-# taxa_de_acerto_base = 100.0 * acerto_base/len(y_validacao)
-# print('Taxa de acerto base: ' + str(taxa_de_acerto_base) + '%')
-# print('Total de testes: ' + str(len(x_validacao)))
+#Gera o gráfico de acurácia da previsão (predict) de cada classificador.
+accs = []
+for i in range(len(classificadores)):
+    acc = resultados_validacao.get(classificadores[i])
+    accs.append(acc)
+grf.mostrarGraficoBarras(nomes, accs, "Acurácia (na Validação)", "")
