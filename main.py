@@ -75,6 +75,6 @@ for i in range(len(metricas)):
 #Gera o gráfico de acurácia da previsão (predict) de cada classificador.
 accs = []
 for i in range(len(classificadores)):
-    acc = resultados_validacao.get(classificadores[i])
+    acc = resultados_validacao.get(nomes[i])
     accs.append(acc)
 grf.mostrarGraficoBarras(nomes, accs, "Acurácia (na Validação)", "")
