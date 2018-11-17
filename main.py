@@ -3,6 +3,7 @@ import numpy as np
 import ProcessadorTexto as prtxt
 import Graficos as grf
 from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_validate
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.naive_bayes import MultinomialNB
@@ -11,8 +12,12 @@ from sklearn.svm import NuSVC
 from sklearn.svm import LinearSVC
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import make_scorer
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import accuracy_score
 
-TOTAL_KFOLDS = 5
+TOTAL_KFOLDS = 15
 ACCURACY = 0
 BALANCED_ACC = 1
 ROC_AUC = 2
@@ -21,7 +26,7 @@ kfolds = [i+2 for i in range(TOTAL_KFOLDS)]
 resultados_metricas = {}
 
 #Métricas de avaliação de erro a serem empregadas para verificar o desempenho de cada um dos classificadores.
-metricas = ['accuracy', 'balanced_accuracy', 'roc_auc']
+metricas = ['accuracy','balanced_accuracy' 'roc_auc']
 
 #Criação de todos os classificadores.
 nomes = ['Logistic Regression', 'Multinomial Naive Bayes',
@@ -51,30 +56,30 @@ tamanho_do_treino = int(porcentagem_de_treino * len(Y))
 tamanho_da_validacao = int(len(Y) - tamanho_do_treino)
 
 #Separa os dados de treino e as anotações corretas de classificação dos mesmos.
-x_treino = X[0:tamanho_do_treino]
-y_treino = Y[0:tamanho_do_treino]
+#x_treino = X[0:tamanho_do_treino]
+#y_treino = Y[0:tamanho_do_treino]
 
 #Separa os dados de validação e as anotações corretas de classificação dos mesmos.
-x_validacao = X[tamanho_do_treino:]
-y_validacao = Y[tamanho_do_treino:]
+#x_validacao = X[tamanho_do_treino:]
+#y_validacao = Y[tamanho_do_treino:]
+
+x_treino, x_validacao, y_treino, y_validacao = train_test_split(X, Y, test_size=0.2, random_state=0)
 
 resultados = []
 
 #Para cada  classificador, realiza treinamento e teste, e avalia o erro/score segundo cada uma das métricas especificadas.
 #Realiza o treino e predição de cada classificador, com determinado nome e base de treino com anotações
 # de respostas corretas. Utiliza cross-validation. Emprega cada uma das métricas de avaliação de desempenho.
-for i in range(len(metricas)):
-    res_mat = []
-    for j in range(len(classificadores)):
-        res_vet_met = []
-        for k in range(TOTAL_KFOLDS):
-            scores = cross_val_score(classificadores[j], x_treino, y_treino, cv=k+2, scoring=metricas[i])
-            taxa = np.mean(scores)
-            msg = "Taxa de acerto ({0}) - métrica '{1}': {2} ({3})".format(nomes[j], metricas[i], taxa, np.std(scores))
-            print(msg)
-            res_vet_met.append(taxa)
-        res_mat.append(res_vet_met)
-    resultados_metricas[metricas[i]] = res_mat
+
+res_mat = []
+for j in range(len(classificadores)):
+    res_vet_met = []
+    for k in range(TOTAL_KFOLDS):
+        scores = cross_validate(classificadores[j], x_treino, y_treino, cv=k+2, scoring=metricas)
+        #msg = "Taxa de acerto ({0}) - métrica '{1}': {2} ".format(nomes[j], scores[metricas[1]], np.std(scores))
+        print(scores)
+    res_mat.append(res_vet_met)
+
 
 #Exibe uma imagem de um gráfico representando cada uma das métricas de avaliação empregadas.
 for chave, valor in resultados_metricas.items():
