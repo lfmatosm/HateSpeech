@@ -17,6 +17,7 @@ def mostrarGraficoLinhas(y_linsvc, y_multnvb, y_lreg, x_kfolds, x_label, y_label
     plt.savefig('teste-' + y_label + '.png')
     plt.show()
 
+#Cria um gráfico de barras a aprtir dos parâmetros passados.
 def mostrarGraficoBarras(classif, accs, x_label, y_label):
     plt.rcdefaults()
     fig, ax = plt.subplots()

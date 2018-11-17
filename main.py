@@ -35,27 +35,17 @@ vetorizacaoDoTexto = proc.processar(textoOriginal)
 X = np.array(vetorizacaoDoTexto)
 Y = np.array(marcas.tolist())
 
-#Separação das bases de treino e validação. A base de teites será separada a partir da base de treino usando cross-validation
-# (validação cruzada - por um número k determinado de vezes, seleciona-se aleatoriamente dentro da base de dados os trechos
-# que serão usados para treinamento e aqueles que serão usados para teste, de acordo com as porcentgens definidas anteriormente.
-# O desempenho do classificador será dado pela média das k vezes em que o cross-validation foi empregado).
-porcentagem_de_treino = 0.8
-
-tamanho_do_treino = int(porcentagem_de_treino * len(Y))
-tamanho_da_validacao = int(len(Y) - tamanho_do_treino)
-
 #Separa os dados de treino/validação e as anotações corretas de classificação dos mesmos.
 x_treino, x_validacao, y_treino, y_validacao = train_test_split(X, Y, test_size=0.2, random_state=0)
 
 resultados = []
 
-#Para cada  classificador, realiza treinamento e teste, e avalia o erro/score segundo cada uma das métricas especificadas.
-#Realiza o treino e predição de cada classificador, com determinado nome e base de treino com anotações
-# de respostas corretas. Utiliza cross-validation. Emprega cada uma das métricas de avaliação de desempenho.
-
 resultados_testes_metricas = {}
 resultados_validacao = {}
 
+#Para cada  classificador, realiza treinamento e teste, e avalia o erro/score segundo cada uma das métricas especificadas.
+#Realiza o treino e predição de cada classificador, com determinado nome e base de treino com anotações
+# de respostas corretas. Utiliza cross-validation. Emprega cada uma das métricas de avaliação de desempenho.
 for i in range(len(classificadores)):
     scores = cross_validate(classificadores[i], x_treino, y_treino, cv=TOTAL_KFOLDS, scoring=metricas)
     print("Scores: ")
@@ -63,6 +53,9 @@ for i in range(len(classificadores)):
     resultados_testes_metricas[nomes[i]] = scores
 print(resultados_testes_metricas)
 
+#Realiza a predição com cada um dos classificadores, utilizando uma base de validação com dados que não estão entre aqueles
+#utilizados para treino pelos classificadores. Além disso, armazena os valores de acurácia obtidos
+#para cada class.
 for i in range(len(classificadores)):
     classificadores[i].fit(x_treino, y_treino)
     results = classificadores[i].predict(x_validacao)
