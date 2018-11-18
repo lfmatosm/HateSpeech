@@ -77,4 +77,4 @@ accs = []
 for i in range(len(classificadores)):
     acc = resultados_validacao.get(nomes[i])
     accs.append(acc)
-grf.mostrarGraficoBarras(nomes, accs, "Acurácia (na Validação)", "")
+grf.mostrarGraficoBarras(nomes, accs, "Acurácia (na Validação)")

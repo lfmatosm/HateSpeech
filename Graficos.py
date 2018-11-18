@@ -19,19 +19,30 @@ def mostrarGraficoLinhas(y_linsvc, y_multnvb, y_lreg, x_kfolds, x_label, y_label
     plt.show()
 
 #Cria um gráfico de barras a aprtir dos parâmetros passados.
-def mostrarGraficoBarras(classif, accs, x_label, y_label):
-    figure(num=None, figsize=(10, 6))
-    plt.rcdefaults()
-    fig, ax = plt.subplots()
-    y_pos = np.array([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+def mostrarGraficoBarras(classif, accs, label):
+    people = ('Tom', 'Dick', 'Harry', 'Slim', 'Jim')
+    x_pos = np.arange(len(classif))
     accs = np.array(accs)
-    ax.barh([0,0.5,1], accs, align='center', ecolor='black',height=0.2)
-    ax.set_xticks(y_pos)
-    ax.set_yticklabels(classif)
-    ax.invert_yaxis()  # labels read top-to-bottom
-    ax.set_xlabel(x_label)
-    ax.set_title(x_label + " vs. " + y_label)
-    plt.legend()
-    plt.savefig('valid-' + x_label + " vs. " + y_label + '.png')
+    plt.bar(x_pos, accs,  align='center', alpha=0.4)
+    plt.xticks(x_pos, classif)
+    plt.yticks([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+    plt.ylabel('Acurácia')
+    plt.title(label)
+    plt.savefig('valid-' + label + '.png')
     plt.show()
+    #
+    # figure(num=None, figsize=(10, 6))
+    # plt.rcdefaults()
+    # fig, ax = plt.subplots()
+    # y_pos = np.array([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+    # accs = np.array(accs)
+    # ax.bar(accs, [0,0.5,1], align='center', ecolor='black',height=0.2)
+    # ax.set_xticks([1, 2, 3], classif)
+    # ax.set_yticklabels(y_pos)
+    # ax.invert_yaxis()  # labels read top-to-bottom
+    # ax.set_xlabel(x_label)
+    # ax.set_title(x_label + " vs. " + y_label)
+    # plt.legend()
+    # plt.savefig('valid-' + x_label + " vs. " + y_label + '.png')
+    # plt.show()
 
