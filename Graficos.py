@@ -30,19 +30,3 @@ def mostrarGraficoBarras(classif, accs, label):
     plt.title(label)
     plt.savefig('valid-' + label + '.png')
     plt.show()
-    #
-    # figure(num=None, figsize=(10, 6))
-    # plt.rcdefaults()
-    # fig, ax = plt.subplots()
-    # y_pos = np.array([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
-    # accs = np.array(accs)
-    # ax.bar(accs, [0,0.5,1], align='center', ecolor='black',height=0.2)
-    # ax.set_xticks([1, 2, 3], classif)
-    # ax.set_yticklabels(y_pos)
-    # ax.invert_yaxis()  # labels read top-to-bottom
-    # ax.set_xlabel(x_label)
-    # ax.set_title(x_label + " vs. " + y_label)
-    # plt.legend()
-    # plt.savefig('valid-' + x_label + " vs. " + y_label + '.png')
-    # plt.show()
-
