@@ -19,7 +19,7 @@ label_metricas = ['Acurácia', 'Acurácia Balanceada', 'Área sobre curva ROC']
 
 #Criação de todos os classificadores.
 nomes = ['Logistic Regression', 'Multinomial Naive Bayes',
-         'VSM (Linear SVC)']
+         'Linear SVC (SVM)']
 classificadores = [LogisticRegression(), MultinomialNB(), LinearSVC()]
 
 proc = prtxt.ProcessadorTexto()
@@ -70,7 +70,17 @@ for i in range(len(metricas)):
     res_mets = []
     for chave, valor in resultados_testes_metricas.items():
         res_mets.append(valor['test_' + metricas[i]])
-    grf.mostrarGraficoLinhas(res_mets[0], res_mets[1], res_mets[2], kfolds, "Número do 'fold'", label_metricas[i])
+    grf.mostrarGraficoLinhas(res_mets[0], res_mets[1], res_mets[2], kfolds,
+                             [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1], "Número do 'fold' (n)", label_metricas[i])
+
+#Gera o gráfico dos tempos de fit time, ou seja, o tempo para realização de fit em cada classificador.
+for i in range(len(classificadores)):
+    t_fit_time = []
+    for valor in resultados_testes_metricas.values():
+        t_fit_time.append(valor['fit_time'])
+    grf.mostrarGraficoLinhas(t_fit_time[0], t_fit_time[1], t_fit_time[2], kfolds,
+                             [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5],
+                             "Número do 'fold' (n)", "Fit Time (s)")
 
 #Gera o gráfico de acurácia da previsão (predict) de cada classificador.
 accs = []
