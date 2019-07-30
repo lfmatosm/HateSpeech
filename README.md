@@ -43,7 +43,6 @@ Após o treinamento de cada classificador e após realizadas previsões usando a
 * **Luiz Felipe de Melo** - *Implementação, documentação.* - [lffloyd](https://github.com/lffloyd)
 * **Vítor Costa** - *Implementação, documentação.* - [vitorhardoim](https://github.com/vitorhardoim)
 * **Renato Bastos** - *Implementação, documentação.* - [RenatoBastos33](https://github.com/RenatoBastos33)
-* **Erick Guimarães** - *Implementação, documentação.* - [ErickGuimaraes](https://github.com/ErickGuimaraes)
 
 Veja a lista de [contribuidores](https://github.com/lffloyd/HateSpeech/contributors) participantes no projeto.
 
